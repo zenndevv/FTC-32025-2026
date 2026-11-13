@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.auto;
+package org.firstinspires.ftc.teamcode.auto;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

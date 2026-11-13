@@ -36,7 +36,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 
 import org.firstinspires.ftc.robotcontroller.internal.auto.SimpleAutonomousOpMode;
-import org.firstinspires.ftc.robotcontroller.internal.manual.SimpleManualOpMode;
 
 public class FtcOpModeRegister implements OpModeRegister {
 
@@ -60,7 +59,6 @@ public class FtcOpModeRegister implements OpModeRegister {
      * @see com.qualcomm.robotcore.eventloop.opmode.Autonomous
      */
     public void register(OpModeManager manager) {
-        manager.register("SimpleAutoOpMode", SimpleAutonomousOpMode.class);
-        manager.register("SimpleManualOpMode", SimpleManualOpMode.class);
+
     }
 }
