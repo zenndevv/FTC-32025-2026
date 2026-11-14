@@ -14,6 +14,11 @@ public class SimpleAutonomousOpMode extends LinearOpMode {
     private DcMotor backLeft;
     private DcMotor backRight;
 
+    // How long each move lasts, in milliseconds.
+    private static final long FORWARD_MS = 100;  // 0.1 seconds
+    private static final long LEFT_MS = 500;     // 0.5 seconds
+    private static final double POWER = 1.0;
+
     @Override
     public void runOpMode() throws InterruptedException {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -38,17 +43,25 @@ public class SimpleAutonomousOpMode extends LinearOpMode {
 
         waitForStart();
 
-        while (opModeIsActive()) {
-            frontLeft.setPower(1);
-            backLeft.setPower(1);
-            frontRight.setPower(1);
-            backRight.setPower(1);
-            sleep(3 * 100);
+        if (opModeIsActive()) {
+            // Forward for 0.1 seconds
+            setDrivePower(POWER, POWER, POWER, POWER);
+            sleep(FORWARD_MS);
 
-            frontLeft.setPower(0);
-            backLeft.setPower(0);
-            frontRight.setPower(0);
-            backRight.setPower(0);
+            // Left (strafe) for 0.5 seconds:
+            // front-left and back-right spin backward, front-right and back-left spin forward
+            setDrivePower(-POWER, POWER, POWER, -POWER);
+            sleep(LEFT_MS);
+
+            // Stop
+            setDrivePower(0, 0, 0, 0);
         }
+    }
+
+    private void setDrivePower(double fl, double fr, double bl, double br) {
+        frontLeft.setPower(fl);
+        frontRight.setPower(fr);
+        backLeft.setPower(bl);
+        backRight.setPower(br);
     }
 }

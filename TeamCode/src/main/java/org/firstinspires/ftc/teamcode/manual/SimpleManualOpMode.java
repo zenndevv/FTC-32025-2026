@@ -14,6 +14,11 @@ public class SimpleManualOpMode extends LinearOpMode {
     private DcMotor backRight;
     private DcMotor spiralOuttake;
 
+    // Largest change in drive power per loop. Lower = smoother but slower to respond.
+    private static final double MAX_STEP = 0.1;
+    // Stick values smaller than this are ignored (stick drift).
+    private static final double DEADBAND = 0.05;
+
     @Override
     public void runOpMode() throws InterruptedException {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -48,10 +53,19 @@ public class SimpleManualOpMode extends LinearOpMode {
 
         waitForStart();
 
+        double lastForward = 0;
+        double lastStrafe = 0;
+        double lastTurn = 0;
+
         while (opModeIsActive()) {
-            double forward = -gamepad1.left_stick_y;
-            double strafe = gamepad1.left_stick_x;
-            double turn = gamepad1.right_stick_x;
+            // Deadband and squaring, then limit how fast each value can change
+            double forward = ramp(shape(-gamepad1.left_stick_y), lastForward, MAX_STEP);
+            double strafe = ramp(shape(gamepad1.left_stick_x), lastStrafe, MAX_STEP);
+            double turn = ramp(shape(gamepad1.right_stick_x), lastTurn, MAX_STEP);
+
+            lastForward = forward;
+            lastStrafe = strafe;
+            lastTurn = turn;
 
             double frontLeftPower = forward + strafe + turn;
             double frontRightPower = forward - strafe - turn;
@@ -85,6 +99,19 @@ public class SimpleManualOpMode extends LinearOpMode {
         stopAllMotors();
     }
 
+    // Ignores a small dead zone, then squares the input (keeping the sign) for finer control
+    private double shape(double x) {
+        if (Math.abs(x) < DEADBAND) {
+            return 0;
+        }
+        return Math.copySign(x * x, x);
+    }
+
+    // Moves toward the target by at most maxStep per loop
+    private double ramp(double target, double current, double maxStep) {
+        return current + Math.max(-maxStep, Math.min(maxStep, target - current));
+    }
+
     private void stopAllMotors() {
         frontLeft.setPower(0);
         frontRight.setPower(0);
@@ -93,4 +120,3 @@ public class SimpleManualOpMode extends LinearOpMode {
         spiralOuttake.setPower(0);
     }
 }
-
